@@ -1,0 +1,12 @@
+-- 입양간 기록 O, 보호소 들어온 기록 X
+-- 동물 ID, 이름 ID
+SELECT ANIMAL_ID
+     , NAME
+  FROM ANIMAL_OUTS
+MINUS
+SELECT ANIMAL_ID
+     , NAME
+  FROM ANIMAL_INS 
+
+
+ 

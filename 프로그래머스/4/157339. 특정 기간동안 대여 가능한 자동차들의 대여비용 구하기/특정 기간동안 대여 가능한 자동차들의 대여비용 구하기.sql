@@ -1,0 +1,29 @@
+-- 자동차 종류 (세단, SUV)
+-- 2022.11.01 ~ 2022.11.30  대여가능
+-- 30일간 대여 금액이 50만원 이상 ~ 200만원 미만
+-- 자동차 ID, 자동차 종류, 대여금액(FEE)
+-- 대여금액 내림, 자동차종류 오름, ID 내림
+
+SELECT 
+   DISTINCT 
+       A.CAR_ID
+     , A.CAR_TYPE
+     , A.DAILY_FEE * (100 - C.DISCOUNT_RATE) * 30 / 100 AS FEE
+  FROM CAR_RENTAL_COMPANY_CAR A
+ LEFT 
+  JOIN CAR_RENTAL_COMPANY_RENTAL_HISTORY B
+    ON A.CAR_ID = B.CAR_ID
+ INNER 
+  JOIN CAR_RENTAL_COMPANY_DISCOUNT_PLAN C
+    ON A.CAR_TYPE = C.CAR_TYPE
+   AND C.DURATION_TYPE = '30일 이상'
+ WHERE A.CAR_TYPE IN ('세단', 'SUV')
+   AND A.CAR_ID NOT IN 
+                     ( SELECT CAR_ID
+                         FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY
+                        WHERE TO_CHAR(START_DATE, 'YYYYMMDD') <= '20221130'
+                          AND TO_CHAR(END_DATE,   'YYYYMMDD') >= '20221101'
+                      )
+   AND A.DAILY_FEE * (100 - C.DISCOUNT_RATE) * 30 / 100 >= 500000
+   AND A.DAILY_FEE * (100 - C.DISCOUNT_RATE) * 30 / 100 < 2000000
+ ORDER BY FEE DESC, CAR_TYPE, CAR_ID DESC
